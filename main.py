@@ -69,18 +69,34 @@ data = {
     "setln": language
 }
 #Send The Info To The Telegram Support Web
-while True:
- try:
-    response = p(url, headers=headers, data=data)
-    #Print Response Status Code (200 = Success)
-    print("Status Code:", response.status_code)
-    #Check If Issue Sent To Telegram Successfully
-    if response.status_code == 200 and '<div class="alert alert-success">' in (response.text):
-        #Print Success Message
-        print(f'Issue Message: {issue_message}\nFull Legal Name {name}\nFor Number: {phone_number}\nHas Been Succesfully Sent To {url}\nCheck Your Email {email} For Any Reply From Telegram Support')
-    else:
-        #Prrint Failure Message
-        print('There Is Something Wrong Happend')
- #Error Handling
- except Exception as e:
-    print(f'Error: {e}')    
+retry = True
+while retry:
+    try:
+        response = p(url, headers=headers, data=data)
+        #Print Response Status Code (200 = Success)
+        print("Status Code:", response.status_code)
+        #Check If Issue Sent To Telegram Successfully
+        if response.status_code == 200 and '<div class="alert alert-success">' in (response.text):
+            #Print Success Message
+            print(f'Issue Message: {issue_message}\nFull Legal Name {name}\nFor Number: {phone_number}\nHas Been Succesfully Sent To {url}\nCheck Your Email {email} For Any Reply From Telegram Support')
+            break
+        else:
+            #Prrint Failure Message
+            print('Something Wrong Happened')
+            while True:
+                user_decision = input(
+                    f"the request was not successful and the response code is: {response.status_code}, do you wish to send the request again? (y/n) ")
+                if user_decision.lower() == "y":
+                    print("Okay! retrying now...")
+                    break
+                elif user_decision.lower() == "n":
+                    print("okay! exiting...")
+                    retry = False
+                    break
+                else:
+                    print("you did not provide a valid response! try again.")
+
+    #Error Handling
+    except Exception as e:
+        print(f'Error: {e}')
+        break
